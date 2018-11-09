@@ -1,4 +1,4 @@
-package CodeCamp2018
+package main
 
 import (
 	"errors"

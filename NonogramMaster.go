@@ -1,4 +1,4 @@
-package CodeCamp2018
+package main
 
 type Master struct {
 	Board *Board
