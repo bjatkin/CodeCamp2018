@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 //All the colors you'll need
 const (
 	Pcolor = "#041630"
@@ -31,5 +27,5 @@ func main() {
 	}
 	mainBoard := NewBoard(5, 5, rowHints, columnHints)
 	nonogramMaster := NewMaster(mainBoard)
-	fmt.Print(nonogramMaster.Board.RowCount)
+	nonogramMaster.Solve()
 }
