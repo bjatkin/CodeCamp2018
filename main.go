@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/dennwc/dom/svg"
 )
 
 //All the colors you'll need
@@ -15,14 +17,12 @@ const (
 func main() {
 	fmt.Println("test")
 
-	// w, h := 300.0, 300.0
+	w, h := 1409, 773
 
-	// root := svg.NewFullscreen()
-	// center := root.NewG()
-	// center.Translate(w/2, h/2)
+	doc := svg.NewFullscreen()
+	root := doc.NewG()
 
-	// mainBoard := Board{
-	// 	SVG: center.NewRect(10, 10),
-	// }
-	// mainBoard.SVG.SetAttribute("fill", Pcolor)
+	size := 500
+	board := NewUIBoard(root, w/2, h/2, size, 5*(size/4))
+	board.AddUIBox(Fill, 10, 10)
 }
