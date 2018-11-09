@@ -7,7 +7,8 @@ type Master struct {
 	Workers []Worker
 }
 
-func newMaster(board *Board) (m *Master) {
+func NewMaster(board *Board) (m *Master) {
+	m = &Master{}
 	m.Board = board
 	m.MovesIn = make(<-chan Move, WorkerCount)
 	m.MovesOut = make(chan<- Move, WorkerCount)

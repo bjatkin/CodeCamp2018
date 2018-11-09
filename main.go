@@ -15,14 +15,6 @@ const (
 )
 
 func main() {
-	fmt.Println("test")
-
-	// w, h := 300.0, 300.0
-
-	// root := svg.NewFullscreen()
-	// center := root.NewG()
-	// center.Translate(w/2, h/2)
-
 	rowHints := [][]int{
 		{2, 2},
 		{1, 1, 1},
@@ -37,6 +29,7 @@ func main() {
 		{1, 2},
 		{2, 2},
 	}
-	mainBoard := newBoard(5, 5, rowHints, columnHints);
-	nonogramMaster := newMaster(mainBoard)
+	mainBoard := NewBoard(5, 5, rowHints, columnHints)
+	nonogramMaster := NewMaster(mainBoard)
+	fmt.Print(nonogramMaster.Board.RowCount)
 }

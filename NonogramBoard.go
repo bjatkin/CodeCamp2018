@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"github.com/dennwc/dom/svg"
 )
 
 type Board struct {
@@ -13,7 +12,8 @@ type Board struct {
 	RowHints    [][]int
 }
 
-func newBoard(rowCount, columnCount int, rowHints, columnHints [][]int) (b *Board) {
+func NewBoard(rowCount, columnCount int, rowHints, columnHints [][]int) (b *Board) {
+	b = &Board{}
 	b.RowCount = rowCount
 	b.ColumnCount = columnCount
 	b.RowHints = rowHints
