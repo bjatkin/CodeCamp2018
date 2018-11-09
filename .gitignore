@@ -13,3 +13,6 @@
 
 # Jetbrains
 .idea/
+
+# Keep wasm out of the repo
+*.wasm
