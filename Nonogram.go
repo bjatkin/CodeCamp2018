@@ -1,4 +1,4 @@
-package CodeCamp2018
+package main
 
 type Mark int
 
@@ -12,4 +12,3 @@ type Move struct {
 	Y    int
 	Mark Mark
 }
-

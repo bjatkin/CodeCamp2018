@@ -1,8 +1,7 @@
-package CodeCamp2018
+package main
 
 type Worker struct {
-	Board Board
-	MovesIn <-chan Move
+	Board    Board
+	MovesIn  <-chan Move
 	MovesOut chan<- Move
 }
-
