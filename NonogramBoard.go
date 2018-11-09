@@ -9,3 +9,12 @@ type Board struct {
 	ColumnHints [][]int
 	RowHints    [][]int
 }
+
+func newBoard(rowCount, columnCount int, rowHints, columnHints [][]int) (b *Board) {
+	b.RowCount = rowCount
+	b.ColumnCount = columnCount
+	b.RowHints = rowHints
+	b.ColumnHints = columnHints
+	return
+}
+
