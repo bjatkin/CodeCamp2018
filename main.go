@@ -11,6 +11,8 @@ const (
 )
 
 func main() {
+	drawUI()
+
 	rowHints := [][]int{
 		{2, 2},
 		{1, 1, 1},
@@ -18,7 +20,7 @@ func main() {
 		{3},
 		{1, 3},
 	}
-	columnHints := [][]int {
+	columnHints := [][]int{
 		{2, 1},
 		{1},
 		{1, 2},
