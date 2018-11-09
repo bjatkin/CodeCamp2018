@@ -9,6 +9,13 @@ func drawUI() {
 	root := doc.NewG()
 
 	size := 500
-	board := NewUIBoard(root, w/2, h/2, size, 5*(size/4))
-	board.AddUIBox(Fill, 10, 10)
+	cols := 10
+	rows := 10
+	board := NewUIBoard(root, w/2-size/2, h/2-(5*(size/4))/2, size, 5*(size/4), cols, rows)
+	board.UpdateCoord(Fill, 0, 0)
+	for j := 0; j < cols; j++ {
+		for i := 0; i < rows; i++ {
+			board.UpdateCoord(Fill, i, j)
+		}
+	}
 }
