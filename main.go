@@ -1,5 +1,10 @@
 package main
 
+import (
+	"math/rand"
+	"time"
+)
+
 //All the colors you'll need
 const (
 	Pcolor = "#041630"
@@ -9,6 +14,10 @@ const (
 
 	WorkerCount = 4
 )
+
+func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
+}
 
 func main() {
 	drawUI()
