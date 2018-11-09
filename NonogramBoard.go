@@ -1,6 +1,9 @@
 package CodeCamp2018
 
-import "github.com/dennwc/dom/svg"
+import (
+	"errors"
+	"github.com/dennwc/dom/svg"
+)
 
 type Board struct {
 	ColumnCount int
@@ -18,3 +21,13 @@ func newBoard(rowCount, columnCount int, rowHints, columnHints [][]int) (b *Boar
 	return
 }
 
+func (b Board) MarkCell(m Move) (bool, error) {
+	if m.X > b.ColumnCount {
+		return false, errors.New("Board Error: X value larger than ColumnCount")
+	}
+	if m.Y > b.RowCount {
+		return false, errors.New("Board Error: Y value larger than Rowcount")
+	}
+	b.BoardMarks[m.X][m.Y] = m.Mark
+	return true, nil
+}

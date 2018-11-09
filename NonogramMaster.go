@@ -17,3 +17,10 @@ func newMaster(board *Board) (m *Master) {
 	}
 	return
 }
+
+func (m Master) newWorker() {
+	m.Workers = append(m.Workers, Worker {
+		MovesIn: make(<-chan Move, WorkerCount),
+		MovesOut: make(chan<- Move, WorkerCount),
+	})
+}
