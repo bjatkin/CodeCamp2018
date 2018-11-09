@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/dennwc/dom"
 	"github.com/dennwc/dom/svg"
 )
@@ -9,8 +11,8 @@ type UIBoard struct {
 	root       *svg.G
 	board      []*svg.Line
 	squares    []UIBox
-	colNumbers []*svg.Text
-	rowNumbers []*svg.Text
+	colNumbers []UIText
+	rowNumbers []UIText
 	x          int
 	y          int
 	width      int
@@ -19,7 +21,7 @@ type UIBoard struct {
 	rows       int
 }
 
-func NewUIBoard(root *svg.G, x, y, height, width, rows, cols int) UIBoard {
+func NewUIBoard(root *svg.G, x, y, height, width, rows, cols int, rowNum, colNum [][]int) UIBoard {
 	board := []*svg.Line{
 		root.NewLine(),
 		root.NewLine(),
@@ -29,12 +31,6 @@ func NewUIBoard(root *svg.G, x, y, height, width, rows, cols int) UIBoard {
 		root.NewLine(),
 	}
 
-	cNum := []*svg.Text{
-		root.NewText("test"),
-	}
-	rNum := []*svg.Text{
-		root.NewText("test row"),
-	}
 	for _, line := range board {
 		line.SetStrokeWidth(1)
 		line.SetAttribute("stroke", Scolor)
@@ -46,18 +42,60 @@ func NewUIBoard(root *svg.G, x, y, height, width, rows, cols int) UIBoard {
 	board[4].SetPos(dom.Point{x + 3*(width/4), y + height}, dom.Point{x + width/4, y + height})
 	board[5].SetPos(dom.Point{x + width/4, y + height}, dom.Point{x, y + height/2})
 
-	return UIBoard{
-		board:      board,
-		root:       root,
-		x:          x,
-		y:          y,
-		width:      width,
-		height:     height,
-		rows:       rows,
-		cols:       cols,
-		colNumbers: cNum,
-		rowNumbers: rNum,
+	ret := UIBoard{
+		board:  board,
+		root:   root,
+		x:      x,
+		y:      y,
+		width:  width,
+		height: height,
+		rows:   rows,
+		cols:   cols,
 	}
+
+	for i, r := range rowNum {
+		ret.rowNumbers = append(ret.rowNumbers, ret.AddText(false, r, i))
+	}
+
+	for i, c := range colNum {
+		ret.colNumbers = append(ret.colNumbers, ret.AddText(true, c, i))
+	}
+
+	return ret
+}
+
+type UIText struct {
+	txt []*svg.Text
+}
+
+func (board *UIBoard) AddText(horizontal bool, nums []int, index int) UIText {
+	ret := UIText{}
+	minX := board.x + board.width/4
+	maxX := board.x + 3*(board.width/4)
+	minY := board.y + board.height/5
+
+	size := ((maxX - minX) / board.cols)
+	fontSize := size - 15
+
+	if fontSize > 25 {
+		fontSize = 25
+	}
+
+	if fontSize < 6 {
+		fontSize = 6
+	}
+	for i, num := range nums {
+		n := board.root.NewText(fmt.Sprintf("%d", num))
+		n.SetAttribute("style", fmt.Sprintf("fill: %s; font: %dpx sans-serif;", Scolor, fontSize))
+
+		if horizontal {
+			n.Translate(float64((minX+index*size)+size/3), float64(minY-fontSize*i)-2)
+		} else {
+			n.Translate(float64(minX-fontSize-(fontSize*i)), float64(((minY+size)+index*size)-size/2))
+		}
+		ret.txt = append(ret.txt, n)
+	}
+	return ret
 }
 
 type UIBox struct {
