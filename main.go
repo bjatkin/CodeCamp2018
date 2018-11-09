@@ -11,6 +11,8 @@ const (
 	Scolor = "#5a8bbc"
 	Black  = "#000020"
 	White  = "#f4f4ff"
+
+	WorkerCount = 4
 )
 
 func main() {
@@ -22,8 +24,21 @@ func main() {
 	center := root.NewG()
 	center.Translate(w/2, h/2)
 
-	mainBoard := Board{
-		SVG: center.NewRect(10, 10),
+	rowHints := [][]int{
+		{2, 2},
+		{1, 1, 1},
+		{0},
+		{3},
+		{1, 3},
 	}
-	mainBoard.SVG.SetAttribute("fill", Pcolor)
+	columnHints := [][]int {
+		{2, 1},
+		{1},
+		{1, 2},
+		{1, 2},
+		{2, 2},
+	}
+	mainBoard := newBoard(5, 5, rowHints, columnHints);
+	nonogramMaster := newMaster(mainBoard)
+
 }
