@@ -7,10 +7,10 @@ import (
 
 //All the colors you'll need
 const (
-	Pcolor = "#041630"
-	Scolor = "#5a8bbc"
-	Black  = "#000020"
-	White  = "#f4f4ff"
+	BGcolor = "#041630"
+	Scolor  = "#5a8bbc"
+	Black   = "#000020"
+	White   = "#f4f4ff"
 
 	WorkerCount = 4
 )
@@ -20,8 +20,6 @@ func init() {
 }
 
 func main() {
-	drawUI()
-
 	rowHints := [][]int{
 		{2, 2},
 		{1, 1, 1},
@@ -36,6 +34,9 @@ func main() {
 		{1, 2},
 		{2, 2},
 	}
+
+	drawUI(rowHints, columnHints)
+
 	mainBoard := NewBoard(5, 5, rowHints, columnHints)
 	nonogramMaster := NewMaster(mainBoard)
 	nonogramMaster.Solve()

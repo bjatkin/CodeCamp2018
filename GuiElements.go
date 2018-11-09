@@ -100,19 +100,39 @@ func (board *UIBoard) AddText(horizontal bool, nums []int, index int) UIText {
 
 type UIBox struct {
 	square *svg.Rect
+	cross  []*svg.Line
 	state  Mark
 	x      int
 	y      int
 }
 
 func (board *UIBoard) AddUIBox(state Mark, x, y, width, height int) UIBox {
+	cross := []*svg.Line{
+		board.root.NewLine(),
+		board.root.NewLine(),
+	}
 	ret := UIBox{
-		square: board.root.NewRect(width-1, height-1),
+		square: board.root.NewRect(width-2, height-2),
+		cross:  cross,
 		state:  state,
 		x:      x,
 		y:      y,
 	}
-	ret.square.SetAttribute("fill", Scolor)
+
+	switch state {
+	case Fill:
+		ret.square.SetAttribute("fill", Scolor)
+	case Cross:
+		ret.square.SetAttribute("fill-opacity", "0.0")
+		ret.square.SetAttribute("style", "stroke-width: 1px; stroke: "+Scolor)
+	}
+
+	ret.cross[0].SetStrokeWidth(1)
+	ret.cross[0].SetStrokeWidth(1)
+	ret.cross[0].SetAttribute("stroke", Scolor)
+	ret.cross[1].SetAttribute("stroke", Scolor)
+	ret.cross[0].SetPos(dom.Point{x + 5, y + 5}, dom.Point{x + width - 7, y + height - 7})
+	ret.cross[1].SetPos(dom.Point{x + 5, y + height - 7}, dom.Point{x + width - 7, y + 5})
 	ret.square.Translate(float64(x), float64(y))
 	return ret
 }
