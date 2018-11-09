@@ -1,7 +1,8 @@
 package CodeCamp2018
 
 type Master struct {
-	Board Board
+	Board *Board
 	MovesIn <-chan Move
 	MovesOut chan<- Move
+	Workers []Worker
 }
