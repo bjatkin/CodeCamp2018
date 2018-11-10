@@ -74,13 +74,13 @@ func main() {
 			{3},
 			{0},
 			{0},
-			{3},
+			{0},
 		}
 		columnHints = [][]int{
-			{1},
-			{2},
-			{2},
-			{1},
+			{3},
+			{0},
+			{0},
+			{0},
 		}
 	})
 
@@ -89,6 +89,7 @@ func main() {
 	mainBoard := NewBoard(len(rowHints), len(columnHints), rowHints, columnHints)
 	Test("b", func() {
 		mainBoard.BoardMarks[0][1] = Fill
+		mainBoard.BoardMarks[3][0] = Fill
 	})
 	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)
 	nonogramMaster.Solve()

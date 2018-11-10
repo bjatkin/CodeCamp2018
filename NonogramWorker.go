@@ -315,7 +315,7 @@ func (w Worker) SolveByGlue() {
 		for i, hint := range w.Board.RowHints[r] {
 			l, start := getChunkRow(row, i)
 			Logf("b", "1: %d, %d, %v, %d", l, start, row, i)
-			if l > hint {
+			if l > hint || l == 0 {
 				continue
 			}
 			end := start + l
@@ -351,113 +351,46 @@ func (w Worker) SolveByGlue() {
 		}
 	}
 
-	return
-	// for row, hints := range w.Board.RowHints {
-	// 	for r, hint := range hints {
-	// 		chunks, offsets := getRowChunk(w.Board.BoardMarks[r])
-	// 		//Prepend a zero cause go is dumb
-	// 		offsets = flipArray(offsets)
-	// 		offsets = append(offsets, 0)
-	// 		offsets = flipArray(offsets)
-	// 		for i := offsets[r], i <//i, row := range w.Board.BoardMarks[r] {
-
-	// 		}
-	// 	}
-	// }
-	left, right := false, false
-	for row, hints := range w.Board.RowHints {
-		for _, hint := range hints {
-			farLeft := make([]Mark, len(w.Board.BoardMarks[row]))
-			farRight := make([]Mark, len(w.Board.BoardMarks[row]))
-			left, right = false, false
-			for m, mark := range w.Board.BoardMarks[row] {
-				Log("b", "here")
-				if mark == Fill {
-					for k := m; k < m+hint; k++ {
-						if m-1 >= 0 && w.Board.BoardMarks[row][m-1] == Fill {
-							break
-						}
-						if m+hint-1 < len(w.Board.BoardMarks[row]) {
-							break
-						}
-						Log("b", "far right")
-						if len(farRight) < m+hint {
-							continue
-						}
-						farRight[k] = Fill
-						left = true
-					}
-					if len(w.Board.BoardMarks[row]) > m+1 && w.Board.BoardMarks[row][m+1] == Fill {
-						continue
-					}
-					for j := m - hint; j < m; j++ {
-						Logf("b", "far left %v, m: %d, hint: %d", w.Board.BoardMarks[row], m, hint)
-						if j < 0 {
-							continue
-						}
-						farLeft[j] = Fill
-						right = true
-					}
-				}
+	for c := 0; c < len(w.Board.BoardMarks); c++ {
+		farLeft := make([]Mark, len(w.Board.BoardMarks))
+		farRight := make([]Mark, len(w.Board.BoardMarks))
+		for i, hint := range w.Board.ColumnHints[c] {
+			l, start := getChunkCol(w.Board.BoardMarks, c, i)
+			Logf("b", "1: %d, %d, %d", l, start, i)
+			if l > hint || l == 0 {
+				continue
 			}
-			if left && right {
-				Logf("b", "fill\n%v\n%v", farLeft, farRight)
-				for i, leftFill := range farLeft {
-					if leftFill == farRight[i] && leftFill == Fill {
-						Logf("b", "X: %d, Y: %d", i, row)
-						w.MovesOut <- Move{
-							WorkerId: w.Id,
-							X:        i,
-							Y:        row,
-							Mark:     Fill,
-						}
-					}
+			end := start + l
+			leftStart := end - hint
+			rightEnd := start + hint
+			if leftStart < 0 {
+				leftStart = 0
+			}
+			for b := leftStart; b < leftStart+hint; b++ {
+				farLeft[b] = Fill
+			}
+			if rightEnd > len(w.Board.BoardMarks)-1 {
+				rightEnd = len(w.Board.BoardMarks) - 1
+			}
+			Logf("b", "2: %d, %d", leftStart, rightEnd)
+			for j := rightEnd; j > rightEnd-hint; j-- {
+				Logf("b", "%d", j)
+				farRight[j] = Fill
+			}
+		}
+
+		Logf("b", "fill\n%v\n%v", farLeft, farRight)
+		for i, leftFill := range farLeft {
+			if leftFill == farRight[i] && leftFill == Fill {
+				w.MovesOut <- Move{
+					WorkerId: w.Id,
+					X:        c,
+					Y:        i,
+					Mark:     Fill,
 				}
 			}
 		}
 	}
-	Log("b", "did rows")
-
-	//Now do the columns
-	top, bot := false, false
-	for col, hints := range w.Board.ColumnHints {
-		for _, hint := range hints {
-			farTop := make([]Mark, len(w.Board.BoardMarks))
-			farBot := make([]Mark, len(w.Board.BoardMarks))
-			top, bot = false, false
-			for m, mark := range w.Board.BoardMarks {
-				if mark[col] == Fill {
-					for k := m; k < m+hint; k++ {
-						if len(farTop) < m+hint {
-							continue
-						}
-						farTop[k] = Fill
-						left = true
-					}
-					if len(w.Board.BoardMarks) > m+1 && w.Board.BoardMarks[m+1][col] == Fill {
-						continue
-					}
-					for j := m; j > m-hint; j-- {
-						farBot[j] = Fill
-						right = true
-					}
-				}
-			}
-			if top && bot {
-				for i, botFill := range farBot {
-					if botFill == farTop[i] && botFill == Fill {
-						w.MovesOut <- Move{
-							WorkerId: w.Id,
-							X:        col,
-							Y:        i,
-							Mark:     Fill,
-						}
-					}
-				}
-			}
-		}
-	}
-	Log("b", "did columns")
 }
 
 func (w Worker) SolveByJoining() {
