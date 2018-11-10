@@ -100,10 +100,10 @@ func main() {
 
 	mainBoard := NewBoard(len(rowHints), len(columnHints), rowHints, columnHints)
 	Test("bi", func() {
-		board.UpdateCoord(Fill, 0, 0)
+		board.UpdateCoord(Move{Mark: Fill, X: 0, Y:0 })
 		mainBoard.BoardMarks[0][0] = Fill
 
-		board.UpdateCoord(Fill, 5, 0)
+		board.UpdateCoord(Move{Mark: Fill, X: 5, Y: 0})
 		mainBoard.BoardMarks[0][5] = Fill
 	})
 	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)
