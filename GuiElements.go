@@ -110,10 +110,12 @@ func (board *UIBoard) AddUIBox(state Mark, x, y, width, height int) UIBox {
 	// Check for a box at these coordinates
 	var ret UIBox
 	found := false
-	for _, box := range board.squares {
-		if box.x == x && box.y == y {
-			ret = box
-			found = true
+	if len(board.squares) > 0 {
+		for _, box := range board.squares {
+			if box.x == x && box.y == y {
+				ret = box
+				found = true
+			}
 		}
 	}
 
@@ -122,8 +124,6 @@ func (board *UIBoard) AddUIBox(state Mark, x, y, width, height int) UIBox {
 			board.root.NewLine(),
 			board.root.NewLine(),
 		}
-		ret.cross[0].SetPos(dom.Point{x + 5, y + 5}, dom.Point{x + width - 7, y + height - 7})
-		ret.cross[1].SetPos(dom.Point{x + 5, y + height - 7}, dom.Point{x + width - 7, y + 5})
 
 		ret = UIBox{
 			square: board.root.NewRect(width-2, height-2),
@@ -133,6 +133,8 @@ func (board *UIBoard) AddUIBox(state Mark, x, y, width, height int) UIBox {
 			y:      y,
 		}
 		ret.square.Translate(float64(x), float64(y))
+		ret.cross[0].SetPos(dom.Point{x + 5, y + 5}, dom.Point{x + width - 7, y + height - 7})
+		ret.cross[1].SetPos(dom.Point{x + 5, y + height - 7}, dom.Point{x + width - 7, y + 5})
 	}
 
 	switch state {
@@ -140,19 +142,19 @@ func (board *UIBoard) AddUIBox(state Mark, x, y, width, height int) UIBox {
 		ret.square.SetAttribute("fill", Scolor)
 		ret.square.SetAttribute("style", "")
 		ret.cross[0].SetStrokeWidth(0)
-		ret.cross[0].SetStrokeWidth(0)
+		ret.cross[1].SetStrokeWidth(0)
 	case Cross:
 		ret.square.SetAttribute("fill-opacity", "0.0")
 		ret.square.SetAttribute("style", "stroke-width: 1px; stroke: "+Scolor)
 		ret.cross[0].SetStrokeWidth(1)
-		ret.cross[0].SetStrokeWidth(1)
+		ret.cross[1].SetStrokeWidth(1)
 		ret.cross[0].SetAttribute("stroke", Scolor)
 		ret.cross[1].SetAttribute("stroke", Scolor)
 	case Empty:
 		ret.square.SetAttribute("fill-opacity", 0.0)
 		ret.square.SetAttribute("style", "")
 		ret.cross[0].SetStrokeWidth(0)
-		ret.cross[0].SetStrokeWidth(0)
+		ret.cross[1].SetStrokeWidth(0)
 	}
 
 	return ret
