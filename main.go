@@ -21,24 +21,23 @@ func init() {
 
 func main() {
 	GuiMovesIn := make(chan Move, WorkerCount*1000)
-	GuiMovesIn <- Move{0, 0, 0, Fill}
 
 	rowHints := [][]int{
 		{2, 2},
-		{1, 1, 1},
+		{3},
 		{0},
 		{3},
 		{1, 3},
 	}
 	columnHints := [][]int{
 		{2, 1},
-		{1},
+		{4},
 		{1, 2},
 		{1, 2},
-		{2, 2},
+		{5},
 	}
 
-	board := drawUI(500, rowHints, columnHints)
+	board := drawUI(500, columnHints, rowHints)
 
 	mainBoard := NewBoard(5, 5, rowHints, columnHints)
 	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)

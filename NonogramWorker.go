@@ -71,11 +71,9 @@ func (w Worker) SolveBySpaces() {
 func (w Worker) SolveByForcing() {
 	fmt.Printf("Worker[%d] working on Forcing\n", w.Id)
 	for row, hints := range w.Board.RowHints {
-		fmt.Printf("%d", row)
 		chunk, offset := getRowChunk(w.Board.BoardMarks[row])
 		for i, hint := range hints {
-			fmt.Println("b")
-			if len(chunk) < i {
+			if len(chunk) <= i {
 				continue
 			}
 			diff := chunk[i] - hint
@@ -85,6 +83,7 @@ func (w Worker) SolveByForcing() {
 				offset := diff
 				fillIn := hint - diff
 				for k := 0; k < fillIn; k++ {
+					fmt.Printf("fill in X:%d, Y:%d\n", start+offset+k, row)
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
 						X:        start + offset + k,
@@ -97,11 +96,9 @@ func (w Worker) SolveByForcing() {
 	}
 
 	for col, hints := range w.Board.ColumnHints {
-		fmt.Print("a")
 		chunk, offset := getColumnChunk(w.Board.BoardMarks, col)
 		for i, hint := range hints {
-			fmt.Print("a")
-			if len(chunk) < i {
+			if len(chunk) <= i {
 				continue
 			}
 			diff := chunk[i] - hint
@@ -111,7 +108,7 @@ func (w Worker) SolveByForcing() {
 				offset := diff
 				fillIn := hint - diff
 				for k := 0; k < fillIn; k++ {
-					fmt.Print("a")
+					fmt.Printf("fill in X:%d, Y:%d\n", col, start+offset+k)
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
 						X:        col,
@@ -125,20 +122,23 @@ func (w Worker) SolveByForcing() {
 }
 
 func getRowChunk(row []Mark) ([]int, []int) {
-	fmt.Println("row")
 	count := 0
 	ret := []int{}
 	offset := []int{}
 	for i, cell := range row {
-		fmt.Print("a")
 		if cell == Empty {
 			count++
 		} else if count > 0 {
 			ret = append(ret, count)
-			offset = append(offset, i)
+			offset = append(offset, i-count)
 			count = 0
 		}
 	}
+	if count > 0 {
+		ret = append(ret, count)
+		offset = append(offset, len(row)-count)
+	}
+	fmt.Printf("Row Chunks: %d, %d\n", ret, offset)
 	return ret, offset
 }
 
@@ -146,7 +146,7 @@ func getColumnChunk(column [][]Mark, col int) ([]int, []int) {
 	count := 0
 	ret := []int{}
 	offset := []int{}
-	for r := 0; r <= len(column[0]); r++ {
+	for r := 0; r < len(column[0]); r++ {
 		if column[r][col] == Empty {
 			count++
 		} else if count > 0 {
@@ -155,6 +155,11 @@ func getColumnChunk(column [][]Mark, col int) ([]int, []int) {
 			count = 0
 		}
 	}
+	if count > 0 {
+		ret = append(ret, count)
+		offset = append(offset, len(column[0])-count)
+	}
+	fmt.Printf("Col Chunks: %d, %d\n", ret, offset)
 	return ret, offset
 }
 

@@ -18,6 +18,10 @@ func NewBoard(rowCount, columnCount int, rowHints, columnHints [][]int) (b Board
 	b.ColumnCount = columnCount
 	b.RowHints = rowHints
 	b.ColumnHints = columnHints
+	b.BoardMarks = make([][]Mark, rowCount)
+	for r := 0; r < rowCount; r++ {
+		b.BoardMarks[r] = make([]Mark, columnCount)
+	}
 	return
 }
 
