@@ -191,17 +191,17 @@ func (w Worker) SolveByForcing() {
 			if len(chunk) <= i {
 				continue
 			}
-			diff := chunk[i] - hint
+			diff := hint - chunk[i]
 			if float64(diff) < float64(chunk[i])/2 {
 				//We gota match boys!
 				start := offset[i]
-				offset := diff
+				off := diff
 				fillIn := hint - diff
 				for k := 0; k < fillIn; k++ {
-					//fmt.Printf("fill in X:%d, Y:%d\n", start+offset+k, row)
+					fmt.Printf("fill in a X:%d, Y:%d\nchunk: %v, offset: %v\nfillIn: %d\nhint:%d\n", start+off+k-1, row, chunk, offset, fillIn, hint)
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
-						X:        start + offset + k,
+						X:        start + off + k - 1,
 						Y:        row,
 						Mark:     Fill,
 					}
@@ -216,18 +216,18 @@ func (w Worker) SolveByForcing() {
 			if len(chunk) <= i {
 				continue
 			}
-			diff := chunk[i] - hint
+			diff := hint - chunk[i]
 			if float64(diff) < float64(chunk[i])/2 {
 				//We got a macth boys!
 				start := offset[i]
-				offset := diff
+				off := diff
 				fillIn := hint - diff
 				for k := 0; k < fillIn; k++ {
-					//fmt.Printf("fill in X:%d, Y:%d\n", col, start+offset+k)
+					fmt.Printf("fill in b X:%d, Y:%d\nchunk: %v\n offset: %v\n", col, start+off+k, chunk, offset)
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
 						X:        col,
-						Y:        start + offset + k,
+						Y:        start + off + k,
 						Mark:     Fill,
 					}
 				}
@@ -395,6 +395,7 @@ func (w Worker) SolveByGlue() {
 		farLeft := make([]Mark, len(w.Board.BoardMarks))
 		farRight := make([]Mark, len(w.Board.BoardMarks))
 		for i, hint := range w.Board.ColumnHints[c] {
+			_, prev := getChunkCol(w.Board.BoardMarks, c, i-1)
 			l, start := getChunkCol(w.Board.BoardMarks, c, i)
 			// Logf("b", "1: %d, %d, %d", l, start, i)
 			if l > hint || l == 0 {
@@ -403,18 +404,25 @@ func (w Worker) SolveByGlue() {
 			end := start + l
 			leftStart := end - hint
 			rightEnd := start + hint
-			if leftStart < 0 {
-				leftStart = 0
-			}
 			for b := leftStart; b < leftStart+hint; b++ {
+				if leftStart < 0 {
+					// fmt.Printf("%d\n", b-leftStart)
+					farLeft[b-leftStart] = Fill
+					continue
+				}
+
+				if leftStart < prev {
+					farLeft[b+(prev-leftStart)] = Fill
+					continue
+				}
 				farLeft[b] = Fill
 			}
-			if rightEnd > len(w.Board.BoardMarks)-1 {
-				rightEnd = len(w.Board.BoardMarks) - 1
-			}
-			// Logf("b", "2: %d, %d", leftStart, rightEnd)
 			for j := rightEnd; j > rightEnd-hint; j-- {
-				// Logf("b", "%d", j)
+				if rightEnd >= len(farRight) {
+					// fmt.Printf("%d\n", j-(rightEnd-len(farRight))-1)
+					farRight[j-(rightEnd-len(farRight))-1] = Fill
+					continue
+				}
 				farRight[j] = Fill
 			}
 		}
