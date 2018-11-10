@@ -35,15 +35,9 @@ func main() {
 		{2, 2},
 	}
 
-	drawUI(rowHints, columnHints)
+	GuiMovesIn := drawUI(rowHints, columnHints)
 
 	mainBoard := NewBoard(5, 5, rowHints, columnHints)
-	nonogramMaster := NewMaster(mainBoard)
+	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)
 	nonogramMaster.Solve()
-
-	//Wait for the channel to close
-	// for {
-	// <-c
-	// time.Sleep(1000 * time.Millisecond)
-	// }
 }

@@ -26,22 +26,11 @@ func drawUI(rowHints, columnHints [][]int) chan Move {
 
 	//Create a channel to listen for moves on
 	channel := make(chan Move, WorkerCount)
-	channel <- Move{0, 0, 0, Fill}
-	channel <- Move{0, 1, 0, Fill}
-	channel <- Move{0, 2, 0, Fill}
-	channel <- Move{0, 3, 0, Fill}
-	// close(channel)
 	go func() {
 		for {
 			move := <-channel
-			drawMove(move, board)
-			// time.Sleep(100 * time.Millisecond)
-			// fmt.Println("\n\nwaiting for moves")
+			board.UpdateCoord(move.Mark, move.X, move.Y)
 		}
 	}()
 	return channel
-}
-
-func drawMove(m Move, b UIBoard) {
-	b.UpdateCoord(m.Mark, m.X, m.Y)
 }

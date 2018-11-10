@@ -10,17 +10,19 @@ type Master struct {
 	Board    *Board
 	MovesIn  chan Move
 	MovesOut chan Move
+	GuiMovesIn chan Move
 	Tasks    []Method
 	Workers  []Worker
 
 	WaitGroup *sync.WaitGroup
 }
 
-func NewMaster(board *Board) (m *Master) {
+func NewMaster(board *Board, GuiMovesIn chan Move) (m *Master) {
 	m = &Master{}
 	m.Board = board
 	m.MovesIn = make(chan Move, WorkerCount)
 	m.MovesOut = make(chan Move, WorkerCount)
+	m.GuiMovesIn = GuiMovesIn
 	m.Workers = make([]Worker, WorkerCount)
 	m.WaitGroup = &sync.WaitGroup{}
 	m.WaitGroup.Add(WorkerCount)
@@ -58,8 +60,9 @@ func (m Master) Solve() {
 
 	for move := range m.MovesIn {
 		fmt.Printf("Received move from Worker[%d]: %+v\n", move.WorkerId, move)
+		m.GuiMovesIn <- move
 	}
-
+	close(m.GuiMovesIn)
 }
 
 func (m Master) ShuffleMethods() {
