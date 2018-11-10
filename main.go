@@ -20,6 +20,9 @@ func init() {
 }
 
 func main() {
+	GuiMovesIn := make(chan Move, WorkerCount)
+	GuiMovesIn <- Move{0, 0, 0, Fill}
+
 	rowHints := [][]int{
 		{2, 2},
 		{1, 1, 1},
@@ -35,15 +38,20 @@ func main() {
 		{2, 2},
 	}
 
-	drawUI(rowHints, columnHints)
+	board := drawUI(rowHints, columnHints)
 
 	mainBoard := NewBoard(5, 5, rowHints, columnHints)
 	nonogramMaster := NewMaster(mainBoard)
 	nonogramMaster.Solve()
 
-	//Wait for the channel to close
-	// for {
-	// <-c
-	// time.Sleep(1000 * time.Millisecond)
-	// }
+	tick := time.Tick(500 * time.Millisecond)
+	for {
+		select {
+		case <-tick:
+			select {
+			case move := <-GuiMovesIn:
+				drawMove(move, board)
+			}
+		}
+	}
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/dennwc/dom/svg"
 )
 
-func drawUI(rowHints, columnHints [][]int) chan Move {
+func drawUI(rowHints, columnHints [][]int) UIBoard {
 	w, h := 1409, 773
 
 	doc := svg.NewFullscreen()
@@ -24,22 +24,7 @@ func drawUI(rowHints, columnHints [][]int) chan Move {
 	// 	}
 	// }
 
-	//Create a channel to listen for moves on
-	channel := make(chan Move, WorkerCount)
-	channel <- Move{0, 0, 0, Fill}
-	channel <- Move{0, 1, 0, Fill}
-	channel <- Move{0, 2, 0, Fill}
-	channel <- Move{0, 3, 0, Fill}
-	// close(channel)
-	go func() {
-		for {
-			move := <-channel
-			drawMove(move, board)
-			// time.Sleep(100 * time.Millisecond)
-			// fmt.Println("\n\nwaiting for moves")
-		}
-	}()
-	return channel
+	return board
 }
 
 func drawMove(m Move, b UIBoard) {
