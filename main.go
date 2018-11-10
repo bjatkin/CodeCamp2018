@@ -46,6 +46,7 @@ func main() {
 		{11, 2},
 		{10, 2},
 	}
+	Logf("b", "%v", rowHints[10])
 	columnHints := [][]int{
 		{5, 1, 1, 1},
 		{7, 1, 1},
@@ -69,7 +70,7 @@ func main() {
 		{2, 3, 4},
 	}
 
-	board := drawUI(500, columnHints, rowHints)
+	board := drawUI(700, columnHints, rowHints)
 
 	mainBoard := NewBoard(len(rowHints), len(columnHints), rowHints, columnHints)
 	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)

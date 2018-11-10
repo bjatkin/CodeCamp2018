@@ -14,7 +14,7 @@ func drawUI(size int, rowHints, columnHints [][]int) UIBoard {
 
 	cols := len(columnHints)
 	rows := len(rowHints)
-	board := NewUIBoard(root, w/2-size/2, h/2-(5*(size/4))/2, size, 5*(size/4), cols, rows, columnHints, rowHints)
+	board := NewUIBoard(root, w/2-(5*(size/4))/2, h/2-(size/2), size, 5*(size/4), cols, rows, columnHints, rowHints)
 
 	//Fade the GUI in
 	go func() {
