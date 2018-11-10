@@ -41,7 +41,7 @@ func main() {
 	board := drawUI(rowHints, columnHints)
 
 	mainBoard := NewBoard(5, 5, rowHints, columnHints)
-	nonogramMaster := NewMaster(mainBoard)
+	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)
 	nonogramMaster.Solve()
 
 	tick := time.Tick(500 * time.Millisecond)

@@ -26,7 +26,3 @@ func drawUI(rowHints, columnHints [][]int) UIBoard {
 
 	return board
 }
-
-func drawMove(m Move, b UIBoard) {
-	b.UpdateCoord(m.Mark, m.X, m.Y)
-}
