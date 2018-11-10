@@ -1,6 +1,10 @@
 package main
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+	"sync"
+)
 
 type Master struct {
 	Board    *Board
@@ -8,6 +12,8 @@ type Master struct {
 	MovesOut chan Move
 	Tasks    []Method
 	Workers  []Worker
+
+	WaitGroup *sync.WaitGroup
 }
 
 func NewMaster(board *Board) (m *Master) {
@@ -16,8 +22,10 @@ func NewMaster(board *Board) (m *Master) {
 	m.MovesIn = make(chan Move, WorkerCount)
 	m.MovesOut = make(chan Move, WorkerCount)
 	m.Workers = make([]Worker, WorkerCount)
+	m.WaitGroup = &sync.WaitGroup{}
+	m.WaitGroup.Add(WorkerCount)
 	for i := 0; i < WorkerCount; i++ {
-		m.newWorker(i)
+		m.newWorker(i, m.WaitGroup)
 	}
 	m.Tasks = make([]Method, MethodCount)
 	for i := 0; i < int(MethodCount); i++ {
@@ -26,12 +34,13 @@ func NewMaster(board *Board) (m *Master) {
 	return
 }
 
-func (m Master) newWorker(id int) {
+func (m Master) newWorker(id int, WaitGroup *sync.WaitGroup) {
 	m.Workers[id] = Worker{
-		Id:       id,
-		Board:    m.Board,
-		MovesIn:  make(<-chan Move, WorkerCount),
-		MovesOut: m.MovesIn,
+		Id:        id,
+		Board:     m.Board,
+		MovesIn:   make(chan Move, WorkerCount),
+		MovesOut:  m.MovesIn,
+		WaitGroup: WaitGroup,
 	}
 }
 
@@ -39,8 +48,18 @@ func (m Master) Solve() {
 	for i := 0; i < WorkerCount; i++ {
 		m.ShuffleMethods()
 		m.Workers[i].Tasks = m.Tasks
-		m.Workers[i].Solve()
+		go m.Workers[i].Solve()
 	}
+
+	go func() {
+		m.WaitGroup.Wait()
+		close(m.MovesIn)
+	}()
+
+	for move := range m.MovesIn {
+		fmt.Printf("Received move from Worker[%d]: %+v\n", move.WorkerId, move)
+	}
+
 }
 
 func (m Master) ShuffleMethods() {
