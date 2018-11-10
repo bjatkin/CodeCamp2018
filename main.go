@@ -20,7 +20,7 @@ func init() {
 }
 
 func main() {
-	GuiMovesIn := make(chan Move, WorkerCount)
+	GuiMovesIn := make(chan Move, WorkerCount * 100)
 	GuiMovesIn <- Move{0, 0, 0, Fill}
 
 	rowHints := [][]int{

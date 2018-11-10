@@ -43,7 +43,6 @@ func (w Worker) Solve() (bool, error) {
 		}
 	}
 
-	close(w.MovesOut)
 	fmt.Printf("Worker[%d] is done working\n", w.Id)
 	return true, nil
 }
