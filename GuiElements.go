@@ -68,7 +68,16 @@ type UIText struct {
 	txt []*svg.Text
 }
 
+func flipArray(numbers []int) []int {
+	for i := 0; i < len(numbers)/2; i++ {
+		j := len(numbers) - i - 1
+		numbers[i], numbers[j] = numbers[j], numbers[i]
+	}
+	return numbers
+}
+
 func (board *UIBoard) AddText(horizontal bool, nums []int, index int) UIText {
+	nums = flipArray(nums)
 	ret := UIText{}
 	minX := board.x + board.width/4
 	maxX := board.x + 3*(board.width/4)

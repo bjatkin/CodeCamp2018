@@ -73,7 +73,7 @@ func main() {
 	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)
 	nonogramMaster.Solve()
 
-	tick := time.Tick(10 * time.Millisecond)
+	tick := time.Tick(50 * time.Millisecond)
 	for {
 		select {
 		case <-tick:
