@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"sync"
 )
 
@@ -25,19 +24,19 @@ func (w Worker) Solve() (bool, error) {
 		case Boxes:
 			w.SolveByBoxes()
 		case Spaces:
-			w.SolveBySpaces()
+			// w.SolveBySpaces()
 		case Forcing:
 			w.SolveByForcing()
 		case Glue:
-			w.SolveByGlue()
+			// w.SolveByGlue()
 		case Joining:
-			w.SolveByJoining()
+			// w.SolveByJoining()
 		case Splitting:
-			w.SolveBySplitting()
+			// w.SolveBySplitting()
 		case Punctuating:
-			w.SolveByPunctuating()
+			// w.SolveByPunctuating()
 		case Mercury:
-			w.SolveByMercury()
+			// w.SolveByMercury()
 		default:
 			return false, errors.New("worker error: Unknown task assigned")
 		}
@@ -132,7 +131,97 @@ func (w Worker) SolveBySpaces() {
 
 func (w Worker) SolveByForcing() {
 	fmt.Printf("Worker[%d] working on Forcing\n", w.Id)
-	w.RandomMoves()
+	for row, hints := range w.Board.RowHints {
+		chunk, offset := getRowChunk(w.Board.BoardMarks[row])
+		for i, hint := range hints {
+			if len(chunk) <= i {
+				continue
+			}
+			diff := chunk[i] - hint
+			if float64(diff) < float64(chunk[i])/2 {
+				//We gota match boys!
+				start := offset[i]
+				offset := diff
+				fillIn := hint - diff
+				for k := 0; k < fillIn; k++ {
+					fmt.Printf("fill in X:%d, Y:%d\n", start+offset+k, row)
+					w.MovesOut <- Move{
+						WorkerId: w.Id,
+						X:        start + offset + k,
+						Y:        row,
+						Mark:     Fill,
+					}
+				}
+			}
+		}
+	}
+
+	for col, hints := range w.Board.ColumnHints {
+		chunk, offset := getColumnChunk(w.Board.BoardMarks, col)
+		for i, hint := range hints {
+			if len(chunk) <= i {
+				continue
+			}
+			diff := chunk[i] - hint
+			if float64(diff) < float64(chunk[i])/2 {
+				//We got a macth boys!
+				start := offset[i]
+				offset := diff
+				fillIn := hint - diff
+				for k := 0; k < fillIn; k++ {
+					fmt.Printf("fill in X:%d, Y:%d\n", col, start+offset+k)
+					w.MovesOut <- Move{
+						WorkerId: w.Id,
+						X:        col,
+						Y:        start + offset + k,
+						Mark:     Fill,
+					}
+				}
+			}
+		}
+	}
+}
+
+func getRowChunk(row []Mark) ([]int, []int) {
+	count := 0
+	ret := []int{}
+	offset := []int{}
+	for i, cell := range row {
+		if cell == Empty {
+			count++
+		} else if count > 0 {
+			ret = append(ret, count)
+			offset = append(offset, i-count)
+			count = 0
+		}
+	}
+	if count > 0 {
+		ret = append(ret, count)
+		offset = append(offset, len(row)-count)
+	}
+	fmt.Printf("Row Chunks: %d, %d\n", ret, offset)
+	return ret, offset
+}
+
+func getColumnChunk(column [][]Mark, col int) ([]int, []int) {
+	count := 0
+	ret := []int{}
+	offset := []int{}
+	for r := 0; r < len(column[0]); r++ {
+		if column[r][col] == Empty {
+			count++
+		} else if count > 0 {
+			ret = append(ret, count)
+			offset = append(ret, r)
+			count = 0
+		}
+	}
+	if count > 0 {
+		ret = append(ret, count)
+		offset = append(offset, len(column[0])-count)
+	}
+	fmt.Printf("Col Chunks: %d, %d\n", ret, offset)
+	return ret, offset
 }
 
 func (w Worker) SolveByGlue() {
