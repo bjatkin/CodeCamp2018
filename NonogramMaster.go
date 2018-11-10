@@ -3,11 +3,11 @@ package main
 import "math/rand"
 
 type Master struct {
-	Board *Board
-	MovesIn chan Move
+	Board    *Board
+	MovesIn  chan Move
 	MovesOut chan Move
-	Tasks []Method
-	Workers []Worker
+	Tasks    []Method
+	Workers  []Worker
 }
 
 func NewMaster(board *Board) (m *Master) {
@@ -27,16 +27,16 @@ func NewMaster(board *Board) (m *Master) {
 }
 
 func (m Master) newWorker(id int) {
-	m.Workers[id] = Worker {
-		Id: id,
-		Board: m.Board,
-		MovesIn: make(<-chan Move, WorkerCount),
+	m.Workers[id] = Worker{
+		Id:       id,
+		Board:    m.Board,
+		MovesIn:  make(<-chan Move, WorkerCount),
 		MovesOut: m.MovesIn,
 	}
 }
 
 func (m Master) Solve() {
-	for i:= 0; i < WorkerCount; i++ {
+	for i := 0; i < WorkerCount; i++ {
 		m.ShuffleMethods()
 		m.Workers[i].Tasks = m.Tasks
 		m.Workers[i].Solve()
