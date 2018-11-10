@@ -12,7 +12,7 @@ const (
 	Black   = "#000020"
 	White   = "#f4f4ff"
 
-	WorkerCount = 4
+	WorkerCount = 1
 )
 
 func init() {
@@ -44,7 +44,7 @@ func main() {
 	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)
 	nonogramMaster.Solve()
 
-	tick := time.Tick(500 * time.Millisecond)
+	tick := time.Tick(10 * time.Millisecond)
 	for {
 		select {
 		case <-tick:

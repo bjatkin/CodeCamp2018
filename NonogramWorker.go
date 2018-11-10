@@ -3,16 +3,15 @@ package main
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"sync"
 )
 
 type Worker struct {
-	Id int
-	Board *Board
-	MovesIn chan Move
+	Id       int
+	Board    *Board
+	MovesIn  chan Move
 	MovesOut chan Move
-	Tasks []Method
+	Tasks    []Method
 
 	WaitGroup *sync.WaitGroup
 }
@@ -23,21 +22,21 @@ func (w Worker) Solve() (bool, error) {
 	for _, val := range w.Tasks {
 		switch val {
 		case Boxes:
-			w.SolveByBoxes()
+			// w.SolveByBoxes()
 		case Spaces:
-			w.SolveBySpaces()
+			// w.SolveBySpaces()
 		case Forcing:
 			w.SolveByForcing()
 		case Glue:
-			w.SolveByGlue()
+			// w.SolveByGlue()
 		case Joining:
-			w.SolveByJoining()
+			// w.SolveByJoining()
 		case Splitting:
-			w.SolveBySplitting()
+			// w.SolveBySplitting()
 		case Punctuating:
-			w.SolveByPunctuating()
+			// w.SolveByPunctuating()
 		case Mercury:
-			w.SolveByMercury()
+			// w.SolveByMercury()
 		default:
 			return false, errors.New("worker error: Unknown task assigned")
 		}
@@ -51,15 +50,15 @@ func (w Worker) SolveByBoxes() {
 	fmt.Printf("Worker[%d] working on Boxes\n", w.Id)
 
 	/*
-	// Run on rows
-	for i := 0; i < w.Board.ColumnCount; i++ {
+		// Run on rows
+		for i := 0; i < w.Board.ColumnCount; i++ {
 
-	}
+		}
 
-	// Run on columns
-	for i := 0; i < w.Board.RowCount; i++ {
+		// Run on columns
+		for i := 0; i < w.Board.RowCount; i++ {
 
-	}
+		}
 	*/
 	w.RandomMoves()
 }
@@ -71,7 +70,92 @@ func (w Worker) SolveBySpaces() {
 
 func (w Worker) SolveByForcing() {
 	fmt.Printf("Worker[%d] working on Forcing\n", w.Id)
-	w.RandomMoves()
+	for row, hints := range w.Board.RowHints {
+		fmt.Printf("%d", row)
+		chunk, offset := getRowChunk(w.Board.BoardMarks[row])
+		for i, hint := range hints {
+			fmt.Println("b")
+			if len(chunk) < i {
+				continue
+			}
+			diff := chunk[i] - hint
+			if float64(diff) < float64(chunk[i])/2 {
+				//We gota match boys!
+				start := offset[i]
+				offset := diff
+				fillIn := hint - diff
+				for k := 0; k < fillIn; k++ {
+					w.MovesOut <- Move{
+						WorkerId: w.Id,
+						X:        start + offset + k,
+						Y:        row,
+						Mark:     Fill,
+					}
+				}
+			}
+		}
+	}
+
+	for col, hints := range w.Board.ColumnHints {
+		fmt.Print("a")
+		chunk, offset := getColumnChunk(w.Board.BoardMarks, col)
+		for i, hint := range hints {
+			fmt.Print("a")
+			if len(chunk) < i {
+				continue
+			}
+			diff := chunk[i] - hint
+			if float64(diff) < float64(chunk[i])/2 {
+				//We got a macth boys!
+				start := offset[i]
+				offset := diff
+				fillIn := hint - diff
+				for k := 0; k < fillIn; k++ {
+					fmt.Print("a")
+					w.MovesOut <- Move{
+						WorkerId: w.Id,
+						X:        col,
+						Y:        start + offset + k,
+						Mark:     Fill,
+					}
+				}
+			}
+		}
+	}
+}
+
+func getRowChunk(row []Mark) ([]int, []int) {
+	fmt.Println("row")
+	count := 0
+	ret := []int{}
+	offset := []int{}
+	for i, cell := range row {
+		fmt.Print("a")
+		if cell == Empty {
+			count++
+		} else if count > 0 {
+			ret = append(ret, count)
+			offset = append(offset, i)
+			count = 0
+		}
+	}
+	return ret, offset
+}
+
+func getColumnChunk(column [][]Mark, col int) ([]int, []int) {
+	count := 0
+	ret := []int{}
+	offset := []int{}
+	for r := 0; r <= len(column[0]); r++ {
+		if column[r][col] == Empty {
+			count++
+		} else if count > 0 {
+			ret = append(ret, count)
+			offset = append(ret, r)
+			count = 0
+		}
+	}
+	return ret, offset
 }
 
 func (w Worker) SolveByGlue() {
@@ -100,12 +184,12 @@ func (w Worker) SolveByMercury() {
 }
 
 func (w Worker) RandomMoves() {
-	for i := 0; i < rand.Int() % 100; i++ {
-		w.MovesOut <- Move {
-			WorkerId: w.Id,
-			X: rand.Int() % w.Board.ColumnCount,
-			Y: rand.Int() % w.Board.RowCount,
-			Mark: Mark(rand.Int() % int(MarkCount)),
-		}
-	}
+	// for i := 0; i < rand.Int()%100; i++ {
+	// 	w.MovesOut <- Move{
+	// 		WorkerId: w.Id,
+	// 		X:        rand.Int() % w.Board.ColumnCount,
+	// 		Y:        rand.Int() % w.Board.RowCount,
+	// 		Mark:     Mark(rand.Int() % int(MarkCount)),
+	// 	}
+	// }
 }
