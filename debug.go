@@ -13,3 +13,9 @@ func Logf(i, f string, args []interface{}) {
 		fmt.Printf(f+"\n", args...)
 	}
 }
+
+func Test(i string, op func()) {
+	if i == CURRENT_USER {
+		op()
+	}
+}
