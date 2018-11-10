@@ -70,9 +70,12 @@ type UIText struct {
 
 func flipArray(numbers []int) []int {
 	ret := make([]int, len(numbers))
-	for i := 0; i < len(numbers)/2; i++ {
-		j := len(numbers) - i - 1
-		ret[i], ret[j] = numbers[j], numbers[i]
+	for i, n := range numbers {
+		ret[i] = n
+	}
+	for i := 0; i < len(ret)/2; i++ {
+		j := len(ret) - i - 1
+		ret[i], ret[j] = ret[j], ret[i]
 	}
 	return ret
 }

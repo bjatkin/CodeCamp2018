@@ -8,7 +8,7 @@ func Log(i, msg string) {
 	}
 }
 
-func Logf(i, f string, args []interface{}) {
+func Logf(i, f string, args ...interface{}) {
 	if i == CURRENT_USER {
 		fmt.Printf(f+"\n", args...)
 	}
