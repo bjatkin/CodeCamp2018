@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/dennwc/dom/svg"
 )
 
@@ -29,13 +26,17 @@ func drawUI(rowHints, columnHints [][]int) chan Move {
 
 	//Create a channel to listen for moves on
 	channel := make(chan Move, WorkerCount)
+	channel <- Move{0, 0, 0, Fill}
+	channel <- Move{0, 1, 0, Fill}
+	channel <- Move{0, 2, 0, Fill}
+	channel <- Move{0, 3, 0, Fill}
+	// close(channel)
 	go func() {
-		select {
-		case move := <-channel:
+		for {
+			move := <-channel
 			drawMove(move, board)
-		default:
-			time.Sleep(100 * time.Millisecond)
-			fmt.Println("\n\nwaiting for moves")
+			// time.Sleep(100 * time.Millisecond)
+			// fmt.Println("\n\nwaiting for moves")
 		}
 	}()
 	return channel

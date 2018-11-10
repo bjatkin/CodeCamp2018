@@ -40,4 +40,10 @@ func main() {
 	mainBoard := NewBoard(5, 5, rowHints, columnHints)
 	nonogramMaster := NewMaster(mainBoard)
 	nonogramMaster.Solve()
+
+	//Wait for the channel to close
+	// for {
+	// <-c
+	// time.Sleep(1000 * time.Millisecond)
+	// }
 }
