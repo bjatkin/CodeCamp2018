@@ -12,7 +12,8 @@ const (
 	Black   = "#000020"
 	White   = "#f4f4ff"
 
-	WorkerCount = 4
+	CURRENT_USER = "b"
+	WorkerCount  = 4
 )
 
 func init() {

@@ -23,7 +23,7 @@ func (w Worker) Solve() (bool, error) {
 	for _, val := range w.Tasks {
 		switch val {
 		case Boxes:
-			// w.SolveByBoxes()
+			w.SolveByBoxes()
 		case Spaces:
 			// w.SolveBySpaces()
 		case Forcing:
