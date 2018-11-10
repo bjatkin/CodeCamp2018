@@ -8,7 +8,7 @@ import (
 //All the colors you'll need
 const (
 	BGcolor = "#041630"
-	Scolor  = "#5a8bbc"
+	Scolor  = "#59b7ff"
 	Black   = "#000020"
 	White   = "#f4f4ff"
 
@@ -69,10 +69,28 @@ func main() {
 		{1, 1, 2, 1, 4},
 		{2, 3, 4},
 	}
+	Test("b", func() {
+		rowHints = [][]int{
+			{3},
+			{0},
+			{0},
+			{0},
+		}
+		columnHints = [][]int{
+			{3},
+			{0},
+			{0},
+			{0},
+		}
+	})
 
 	board := drawUI(700, columnHints, rowHints)
 
 	mainBoard := NewBoard(len(rowHints), len(columnHints), rowHints, columnHints)
+	Test("b", func() {
+		mainBoard.BoardMarks[0][1] = Fill
+		mainBoard.BoardMarks[3][0] = Fill
+	})
 	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)
 	nonogramMaster.Solve()
 
