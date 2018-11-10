@@ -16,3 +16,6 @@
 
 # Keep wasm out of the repo
 *.wasm
+
+# Personal Build Files
+*.sh
