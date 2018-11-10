@@ -27,7 +27,7 @@ func (w Worker) Solve() (bool, error) {
 		case Spaces:
 			// w.SolveBySpaces()
 		case Forcing:
-			w.SolveByForcing()
+			//w.SolveByForcing()
 		case Glue:
 			// w.SolveByGlue()
 		case Joining:
@@ -86,6 +86,58 @@ func (w Worker) SolveByBoxes() {
 
 	// Run on rows
 	for i := 0; i < w.Board.ColumnCount; i++ {
+		S := 0
+		// H is the highest value of Hints
+		H := 0
+		for _, value := range w.Board.RowHints[i] {
+			S += value
+			if value > H {
+				H = value
+			}
+		}
+		// S is the total value of the hints plus the spaces between them
+		S += len(w.Board.RowHints[i])-1
+		//fmt.Printf("S = %d = %d + %d\n", S, S - len(w.Board.RowHints[i])+1, len(w.Board.RowHints[i])-1)
+		// D is the difference between the sum and the total length
+		D := w.Board.ColumnCount - S
+		//fmt.Printf("D = %d = %d - %d\n", D, w.Board.ColumnCount, S)
+
+		E := 0
+		for j := 0; j < len(w.Board.RowHints[i]); j++ {
+			// F is the number of cells that can be filled
+			F := w.Board.RowHints[i][j] - D
+			//fmt.Printf("F = %d = %d - %d\n", F, D, w.Board.RowHints[i][j])
+
+			E += w.Board.RowHints[i][j]
+
+			if F > 0 {
+				// Index to begin marking as filled
+				B := E - F
+				fmt.Printf("E = %d = %d + %d + 1\n", E, E - w.Board.RowHints[i][j], w.Board.RowHints[i][j])
+				fmt.Printf("B = %d = %d - %d\n", B, B + F, F)
+
+				fmt.Printf("X: Y:")
+
+				// Fill all cells between the values B and E
+				for k := B; k < E; k++ {
+					w.MovesOut <- Move {
+						WorkerId: w.Id,
+						X: k,
+						Y: i,
+						Mark: Fill,
+					}
+				}
+			}
+
+			// Increment for space
+			E += 1
+		}
+		fmt.Printf("\n")
+	}
+
+	/*
+	// Run on rows
+	for i := 0; i < w.Board.ColumnCount; i++ {
 		A := w.LeftFill(w.Board.RowHints[i], w.Board.ColumnCount)
 		//fmt.Printf("Left: %+v\n", A)
 		B := w.RightFill(w.Board.RowHints[i], w.Board.ColumnCount)
@@ -123,6 +175,7 @@ func (w Worker) SolveByBoxes() {
 			}
 		}
 	}
+	*/
 }
 
 func (w Worker) SolveBySpaces() {
