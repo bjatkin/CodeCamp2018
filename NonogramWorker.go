@@ -145,7 +145,7 @@ func (w Worker) SolveByForcing() {
 				offset := diff
 				fillIn := hint - diff
 				for k := 0; k < fillIn; k++ {
-					fmt.Printf("fill in X:%d, Y:%d\n", start+offset+k, row)
+					//fmt.Printf("fill in X:%d, Y:%d\n", start+offset+k, row)
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
 						X:        start + offset + k,
@@ -170,7 +170,7 @@ func (w Worker) SolveByForcing() {
 				offset := diff
 				fillIn := hint - diff
 				for k := 0; k < fillIn; k++ {
-					fmt.Printf("fill in X:%d, Y:%d\n", col, start+offset+k)
+					//fmt.Printf("fill in X:%d, Y:%d\n", col, start+offset+k)
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
 						X:        col,
@@ -200,7 +200,7 @@ func getRowChunk(row []Mark) ([]int, []int) {
 		ret = append(ret, count)
 		offset = append(offset, len(row)-count)
 	}
-	fmt.Printf("Row Chunks: %d, %d\n", ret, offset)
+	//fmt.Printf("Row Chunks: %d, %d\n", ret, offset)
 	return ret, offset
 }
 
@@ -221,7 +221,7 @@ func getColumnChunk(column [][]Mark, col int) ([]int, []int) {
 		ret = append(ret, count)
 		offset = append(offset, len(column[0])-count)
 	}
-	fmt.Printf("Col Chunks: %d, %d\n", ret, offset)
+	//fmt.Printf("Col Chunks: %d, %d\n", ret, offset)
 	return ret, offset
 }
 

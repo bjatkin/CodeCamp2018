@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 	"sync"
 )
@@ -59,7 +58,7 @@ func (m Master) Solve() {
 	}()
 
 	for move := range m.MovesIn {
-		fmt.Printf("Received move from Worker[%d]: %+v\n", move.WorkerId, move)
+		//fmt.Printf("Received move from Worker[%d]: %+v\n", move.WorkerId, move)
 		m.GuiMovesIn <- move
 	}
 	close(m.GuiMovesIn)
