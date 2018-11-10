@@ -8,11 +8,11 @@ import (
 )
 
 type Worker struct {
-	Id int
-	Board *Board
-	MovesIn chan Move
+	Id       int
+	Board    Board
+	MovesIn  chan Move
 	MovesOut chan Move
-	Tasks []Method
+	Tasks    []Method
 
 	WaitGroup *sync.WaitGroup
 }

@@ -7,17 +7,17 @@ import (
 )
 
 type Master struct {
-	Board    *Board
-	MovesIn  chan Move
-	MovesOut chan Move
+	Board      Board
+	MovesIn    chan Move
+	MovesOut   chan Move
 	GuiMovesIn chan Move
-	Tasks    []Method
-	Workers  []Worker
+	Tasks      []Method
+	Workers    []Worker
 
 	WaitGroup *sync.WaitGroup
 }
 
-func NewMaster(board *Board, GuiMovesIn chan Move) (m *Master) {
+func NewMaster(board Board, GuiMovesIn chan Move) (m *Master) {
 	m = &Master{}
 	m.Board = board
 	m.MovesIn = make(chan Move, WorkerCount)
