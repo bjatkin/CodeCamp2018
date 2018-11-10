@@ -46,7 +46,7 @@ func main() {
 		{11, 2},
 		{10, 2},
 	}
-	Logf("b", "%v", rowHints[10])
+	// Logf("b", "%v", rowHints[10])
 	columnHints := [][]int{
 		{5, 1, 1, 1},
 		{7, 1, 1},
@@ -71,25 +71,40 @@ func main() {
 	}
 	Test("b", func() {
 		rowHints = [][]int{
-			{3},
-			{0},
-			{0},
-			{0},
+			{1},
+			{5},
+			{5},
+			{2, 1, 5},
+			{1, 5, 1},
+			{1, 1, 3, 1},
+			{3, 3, 1},
+			{9},
+			{5},
+			{5},
 		}
 		columnHints = [][]int{
-			{3},
-			{0},
-			{0},
-			{0},
+			{1},
+			{5},
+			{2},
+			{9},
+			{2, 1, 3},
+			{10},
+			{9},
+			{9},
+			{1, 1},
+			{5},
 		}
 	})
 
 	board := drawUI(700, columnHints, rowHints)
 
 	mainBoard := NewBoard(len(rowHints), len(columnHints), rowHints, columnHints)
-	Test("b", func() {
-		mainBoard.BoardMarks[0][1] = Fill
-		mainBoard.BoardMarks[3][0] = Fill
+	Test("bi", func() {
+		board.UpdateCoord(Fill, 0, 0)
+		mainBoard.BoardMarks[0][0] = Fill
+
+		board.UpdateCoord(Fill, 5, 0)
+		mainBoard.BoardMarks[0][5] = Fill
 	})
 	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)
 	nonogramMaster.Solve()

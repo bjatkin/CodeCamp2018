@@ -38,6 +38,6 @@ func (b Board) MarkCell(m Move) error {
 	if m.Y < 0 {
 		return errors.New("board error: Y value less than 0")
 	}
-	b.BoardMarks[m.X][m.Y] = m.Mark
+	b.BoardMarks[m.Y][m.X] = m.Mark
 	return nil
 }

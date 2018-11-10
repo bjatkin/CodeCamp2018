@@ -153,6 +153,7 @@ func (board *UIBoard) AddUIBox(state Mark, x, y, width, height int) UIBox {
 	switch state {
 	case Fill:
 		ret.square.SetAttribute("fill", Scolor)
+		ret.square.SetAttribute("fill-opacity", "1.0")
 		ret.square.SetAttribute("style", "")
 		ret.cross[0].SetStrokeWidth(0)
 		ret.cross[1].SetStrokeWidth(0)

@@ -12,7 +12,7 @@ type Worker struct {
 	Board    Board
 	MovesIn  chan Move
 	MovesOut chan Move
-	Done chan bool
+	Done     chan bool
 	Tasks    []Method
 
 	WaitGroup *sync.WaitGroup
@@ -31,9 +31,9 @@ func (w Worker) Solve() (bool, error) {
 			case Spaces:
 				// w.SolveBySpaces()
 			case Forcing:
-				//w.SolveByForcing()
+				// w.SolveByForcing()
 			case Glue:
-				// w.SolveByGlue()
+				w.SolveByGlue()
 			case Joining:
 				// w.SolveByJoining()
 			case Splitting:
@@ -48,9 +48,9 @@ func (w Worker) Solve() (bool, error) {
 		}
 
 		select {
-			case <-w.Done:
-				break
-			default:
+		case <-w.Done:
+			break
+		default:
 		}
 	}
 
@@ -61,7 +61,7 @@ func (w Worker) Solve() (bool, error) {
 func (w Worker) ProcessInbox() {
 	for {
 		select {
-		case move, ok := <- w.MovesIn:
+		case move, ok := <-w.MovesIn:
 			err := w.Board.MarkCell(move)
 			if err != nil {
 				fmt.Printf("%+v\n", err)
@@ -73,7 +73,6 @@ func (w Worker) ProcessInbox() {
 		}
 	}
 }
-
 
 func (w Worker) SolveByBoxes() {
 	fmt.Printf("Worker[%d] working on Boxes\n", w.Id)
@@ -185,7 +184,7 @@ func (w Worker) SolveBySpaces() {
 }
 
 func (w Worker) SolveByForcing() {
-	fmt.Printf("Worker[%d] working on Forcing\n", w.Id)
+	// fmt.Printf("Worker[%d] working on Forcing\n", w.Id)
 	for row, hints := range w.Board.RowHints {
 		chunk, offset := getRowChunk(w.Board.BoardMarks[row])
 		for i, hint := range hints {
@@ -337,38 +336,51 @@ func getChunkCol(m [][]Mark, col, i int) (int, int) {
 }
 
 func (w Worker) SolveByGlue() {
+	fmt.Printf("Worker[%d] working on Glue\n", w.Id)
 	for r, row := range w.Board.BoardMarks {
 		farLeft := make([]Mark, len(row))
 		farRight := make([]Mark, len(row))
 		for i, hint := range w.Board.RowHints[r] {
+			_, prev := getChunkRow(row, i-1)
 			l, start := getChunkRow(row, i)
-			Logf("b", "1: %d, %d, %v, %d", l, start, row, i)
+			// Logf("b", "1: %d, %d, %v, %d", l, start, row, i)
 			if l > hint || l == 0 {
 				continue
 			}
 			end := start + l
 			leftStart := end - hint
-			rightEnd := start + hint
-			if leftStart < 0 {
-				leftStart = 0
+			rightEnd := start + hint - 1
+			if i == 1 {
+				// Logf("b", "1: %d, %d, %v, %d", l, start, row, i)
+				// Logf("b", "2: %d, %d", leftStart, rightEnd)
 			}
 			for b := leftStart; b < leftStart+hint; b++ {
+				if leftStart < 0 {
+					// fmt.Printf("%d\n", b-leftStart)
+					farLeft[b-leftStart] = Fill
+					continue
+				}
+
+				if leftStart < prev {
+					farLeft[b+(prev-leftStart)] = Fill
+					continue
+				}
 				farLeft[b] = Fill
 			}
-			if rightEnd > len(row)-1 {
-				rightEnd = len(row) - 1
-			}
-			Logf("b", "2: %d, %d", leftStart, rightEnd)
 			for j := rightEnd; j > rightEnd-hint; j-- {
-				Logf("b", "%d", j)
+				if rightEnd >= len(farRight) {
+					// fmt.Printf("%d\n", j-(rightEnd-len(farRight))-1)
+					farRight[j-(rightEnd-len(farRight))-1] = Fill
+					continue
+				}
 				farRight[j] = Fill
 			}
 		}
 
-		Logf("b", "fill\n%v\n%v", farLeft, farRight)
+		// Logf("b", "fill\n%v\n%v", farLeft, farRight)
 		for i, leftFill := range farLeft {
 			if leftFill == farRight[i] && leftFill == Fill {
-				Logf("b", "X: %d, Y: %d", i, row)
+				// Logf("b", "X: %d, Y: %d", i, row)
 				w.MovesOut <- Move{
 					WorkerId: w.Id,
 					X:        i,
@@ -384,7 +396,7 @@ func (w Worker) SolveByGlue() {
 		farRight := make([]Mark, len(w.Board.BoardMarks))
 		for i, hint := range w.Board.ColumnHints[c] {
 			l, start := getChunkCol(w.Board.BoardMarks, c, i)
-			Logf("b", "1: %d, %d, %d", l, start, i)
+			// Logf("b", "1: %d, %d, %d", l, start, i)
 			if l > hint || l == 0 {
 				continue
 			}
@@ -400,14 +412,14 @@ func (w Worker) SolveByGlue() {
 			if rightEnd > len(w.Board.BoardMarks)-1 {
 				rightEnd = len(w.Board.BoardMarks) - 1
 			}
-			Logf("b", "2: %d, %d", leftStart, rightEnd)
+			// Logf("b", "2: %d, %d", leftStart, rightEnd)
 			for j := rightEnd; j > rightEnd-hint; j-- {
-				Logf("b", "%d", j)
+				// Logf("b", "%d", j)
 				farRight[j] = Fill
 			}
 		}
 
-		Logf("b", "fill\n%v\n%v", farLeft, farRight)
+		// Logf("b", "fill\n%v\n%v", farLeft, farRight)
 		for i, leftFill := range farLeft {
 			if leftFill == farRight[i] && leftFill == Fill {
 				w.MovesOut <- Move{
