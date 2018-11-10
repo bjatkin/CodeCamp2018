@@ -25,13 +25,19 @@ func NewBoard(rowCount, columnCount int, rowHints, columnHints [][]int) (b Board
 	return
 }
 
-func (b Board) MarkCell(m Move) (bool, error) {
+func (b Board) MarkCell(m Move) error {
 	if m.X > b.ColumnCount {
-		return false, errors.New("board error: X value larger than ColumnCount")
+		return errors.New("board error: X value larger than ColumnCount")
+	}
+	if m.X < 0 {
+		return errors.New("board error: X value less than 0")
 	}
 	if m.Y > b.RowCount {
-		return false, errors.New("board error: Y value larger than RowCount")
+		return errors.New("board error: Y value larger than RowCount")
+	}
+	if m.Y < 0 {
+		return errors.New("board error: Y value less than 0")
 	}
 	b.BoardMarks[m.X][m.Y] = m.Mark
-	return true, nil
+	return nil
 }

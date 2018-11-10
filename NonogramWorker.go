@@ -12,6 +12,7 @@ type Worker struct {
 	Board    Board
 	MovesIn  chan Move
 	MovesOut chan Move
+	Done chan bool
 	Tasks    []Method
 
 	WaitGroup *sync.WaitGroup
@@ -20,31 +21,57 @@ type Worker struct {
 func (w Worker) Solve() (bool, error) {
 	defer w.WaitGroup.Done()
 
-	for _, val := range w.Tasks {
-		switch val {
-		case Boxes:
-			w.SolveByBoxes()
-		case Spaces:
-			// w.SolveBySpaces()
-		case Forcing:
-			//w.SolveByForcing()
-		case Glue:
-			// w.SolveByGlue()
-		case Joining:
-			// w.SolveByJoining()
-		case Splitting:
-			// w.SolveBySplitting()
-		case Punctuating:
-			// w.SolveByPunctuating()
-		case Mercury:
-			// w.SolveByMercury()
-		default:
-			return false, errors.New("worker error: Unknown task assigned")
+	go w.ProcessInbox()
+
+	for {
+		for _, val := range w.Tasks {
+			switch val {
+			case Boxes:
+				w.SolveByBoxes()
+			case Spaces:
+				// w.SolveBySpaces()
+			case Forcing:
+				//w.SolveByForcing()
+			case Glue:
+				// w.SolveByGlue()
+			case Joining:
+				// w.SolveByJoining()
+			case Splitting:
+				// w.SolveBySplitting()
+			case Punctuating:
+				// w.SolveByPunctuating()
+			case Mercury:
+				// w.SolveByMercury()
+			default:
+				return false, errors.New("worker error: Unknown task assigned")
+			}
+		}
+
+		select {
+			case <-w.Done:
+				break
+			default:
 		}
 	}
 
 	fmt.Printf("Worker[%d] is done working\n", w.Id)
 	return true, nil
+}
+
+func (w Worker) ProcessInbox() {
+	for {
+		select {
+		case move, ok := <- w.MovesIn:
+			err := w.Board.MarkCell(move)
+			if err != nil {
+				fmt.Printf("%+v\n", err)
+				fmt.Printf("%+v\n", move)
+			}
+			if !ok {
+				break
+			}
+		}
+	}
 }
 
 

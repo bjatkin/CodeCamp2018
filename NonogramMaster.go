@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"sync"
 )
@@ -41,11 +42,14 @@ func (m Master) newWorker(id int, WaitGroup *sync.WaitGroup) {
 		Board:     m.Board,
 		MovesIn:   make(chan Move, WorkerCount),
 		MovesOut:  m.MovesIn,
+		Done: make(chan bool),
 		WaitGroup: WaitGroup,
 	}
 }
 
 func (m Master) Solve() {
+	go m.ProcessInbox()
+
 	for i := 0; i < WorkerCount; i++ {
 		m.ShuffleMethods()
 		m.Workers[i].Tasks = m.Tasks
@@ -56,12 +60,31 @@ func (m Master) Solve() {
 		m.WaitGroup.Wait()
 		close(m.MovesIn)
 	}()
+}
 
-	for move := range m.MovesIn {
-		//fmt.Printf("Received move from Worker[%d]: %+v\n", move.WorkerId, move)
-		m.GuiMovesIn <- move
+func (m Master) ProcessInbox() {
+	for {
+		select {
+		case move, ok := <- m.MovesIn:
+
+			err := m.Board.MarkCell(move)
+			if err != nil {
+				fmt.Printf("%+v\n", err)
+				fmt.Printf("%+v\n", move)
+			}
+			for _, worker := range m.Workers {
+				worker.MovesIn <- move
+			}
+
+			m.GuiMovesIn <- move
+			if !ok {
+				for _, worker := range m.Workers {
+					worker.Done <- true
+				}
+				close(m.GuiMovesIn)
+			}
+		}
 	}
-	close(m.GuiMovesIn)
 }
 
 func (m Master) ShuffleMethods() {
