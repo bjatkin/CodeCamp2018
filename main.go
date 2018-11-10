@@ -12,9 +12,10 @@ const (
 	Black   = "#000020"
 	White   = "#f4f4ff"
 
-	CURRENT_USER = "b"
-	WorkerCount  = 4
+	WorkerCount = 4
 )
+
+var CURRENT_USER string
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
