@@ -107,33 +107,56 @@ type UIBox struct {
 }
 
 func (board *UIBoard) AddUIBox(state Mark, x, y, width, height int) UIBox {
-	cross := []*svg.Line{
-		board.root.NewLine(),
-		board.root.NewLine(),
+	// Check for a box at these coordinates
+	var ret UIBox
+	found := false
+	if len(board.squares) > 0 {
+		for _, box := range board.squares {
+			if box.x == x && box.y == y {
+				ret = box
+				found = true
+			}
+		}
 	}
-	ret := UIBox{
-		square: board.root.NewRect(width-2, height-2),
-		cross:  cross,
-		state:  state,
-		x:      x,
-		y:      y,
+
+	if !found {
+		cross := []*svg.Line{
+			board.root.NewLine(),
+			board.root.NewLine(),
+		}
+
+		ret = UIBox{
+			square: board.root.NewRect(width-2, height-2),
+			cross:  cross,
+			state:  state,
+			x:      x,
+			y:      y,
+		}
+		ret.square.Translate(float64(x), float64(y))
+		ret.cross[0].SetPos(dom.Point{x + 5, y + 5}, dom.Point{x + width - 7, y + height - 7})
+		ret.cross[1].SetPos(dom.Point{x + 5, y + height - 7}, dom.Point{x + width - 7, y + 5})
 	}
 
 	switch state {
 	case Fill:
 		ret.square.SetAttribute("fill", Scolor)
+		ret.square.SetAttribute("style", "")
+		ret.cross[0].SetStrokeWidth(0)
+		ret.cross[1].SetStrokeWidth(0)
 	case Cross:
 		ret.square.SetAttribute("fill-opacity", "0.0")
 		ret.square.SetAttribute("style", "stroke-width: 1px; stroke: "+Scolor)
+		ret.cross[0].SetStrokeWidth(1)
+		ret.cross[1].SetStrokeWidth(1)
+		ret.cross[0].SetAttribute("stroke", Scolor)
+		ret.cross[1].SetAttribute("stroke", Scolor)
+	case Empty:
+		ret.square.SetAttribute("fill-opacity", 0.0)
+		ret.square.SetAttribute("style", "")
+		ret.cross[0].SetStrokeWidth(0)
+		ret.cross[1].SetStrokeWidth(0)
 	}
 
-	ret.cross[0].SetStrokeWidth(1)
-	ret.cross[0].SetStrokeWidth(1)
-	ret.cross[0].SetAttribute("stroke", Scolor)
-	ret.cross[1].SetAttribute("stroke", Scolor)
-	ret.cross[0].SetPos(dom.Point{x + 5, y + 5}, dom.Point{x + width - 7, y + height - 7})
-	ret.cross[1].SetPos(dom.Point{x + 5, y + height - 7}, dom.Point{x + width - 7, y + 5})
-	ret.square.Translate(float64(x), float64(y))
 	return ret
 }
 
@@ -147,5 +170,5 @@ func (board *UIBoard) UpdateCoord(state Mark, x, y int) {
 
 	width := (maxX - minX) / board.cols
 	height := width
-	board.AddUIBox(state, minX+width*x, minY+height*y, width, height)
+	board.squares = append(board.squares, board.AddUIBox(state, minX+width*x, minY+height*y, width, height))
 }
