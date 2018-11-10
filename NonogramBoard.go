@@ -41,3 +41,7 @@ func (b Board) MarkCell(m Move) error {
 	b.BoardMarks[m.X][m.Y] = m.Mark
 	return nil
 }
+
+func (b Board) CellValue(x, y int) Mark {
+	return b.BoardMarks[x][y]
+}

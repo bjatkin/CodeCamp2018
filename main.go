@@ -100,7 +100,7 @@ func main() {
 		case <-tick:
 			select {
 			case move := <-GuiMovesIn:
-				board.UpdateCoord(move.Mark, move.X, move.Y)
+				board.UpdateCoord(move)
 			}
 		}
 	}

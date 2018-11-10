@@ -119,13 +119,13 @@ type UIBox struct {
 	y      int
 }
 
-func (board *UIBoard) AddUIBox(state Mark, x, y, width, height int) UIBox {
+func (board *UIBoard) AddUIBox(move Move, width, height int) UIBox {
 	// Check for a box at these coordinates
 	var ret UIBox
 	found := false
 	if len(board.squares) > 0 {
 		for _, box := range board.squares {
-			if box.x == x && box.y == y {
+			if box.x == move.X && box.y == move.Y {
 				ret = box
 				found = true
 			}
@@ -141,28 +141,38 @@ func (board *UIBoard) AddUIBox(state Mark, x, y, width, height int) UIBox {
 		ret = UIBox{
 			square: board.root.NewRect(width-2, height-2),
 			cross:  cross,
-			state:  state,
-			x:      x,
-			y:      y,
+			state:  move.Mark,
+			x:      move.X,
+			y:      move.Y,
 		}
-		ret.square.Translate(float64(x), float64(y))
-		ret.cross[0].SetPos(dom.Point{x + 5, y + 5}, dom.Point{x + width - 7, y + height - 7})
-		ret.cross[1].SetPos(dom.Point{x + 5, y + height - 7}, dom.Point{x + width - 7, y + 5})
+		ret.square.Translate(float64(move.X), float64(move.Y))
+		ret.cross[0].SetPos(dom.Point{move.X + 5, move.Y + 5}, dom.Point{move.X + width - 7, move.Y + height - 7})
+		ret.cross[1].SetPos(dom.Point{move.X + 5, move.Y + height - 7}, dom.Point{move.X + width - 7, move.Y + 5})
 	}
 
-	switch state {
+	drawColor := Scolor
+	switch move.MethodId {
+	case Boxes:
+		drawColor = "#FF0000"
+	case Forcing:
+		drawColor = "#00FF00"
+	case Glue:
+		drawColor = "#00FFFF"
+	}
+
+	switch move.Mark {
 	case Fill:
-		ret.square.SetAttribute("fill", Scolor)
+		ret.square.SetAttribute("fill", drawColor)
 		ret.square.SetAttribute("style", "")
 		ret.cross[0].SetStrokeWidth(0)
 		ret.cross[1].SetStrokeWidth(0)
 	case Cross:
 		ret.square.SetAttribute("fill-opacity", "0.0")
-		ret.square.SetAttribute("style", "stroke-width: 1px; stroke: "+Scolor)
+		ret.square.SetAttribute("style", "stroke-width: 1px; stroke: "+drawColor)
 		ret.cross[0].SetStrokeWidth(1)
 		ret.cross[1].SetStrokeWidth(1)
-		ret.cross[0].SetAttribute("stroke", Scolor)
-		ret.cross[1].SetAttribute("stroke", Scolor)
+		ret.cross[0].SetAttribute("stroke", drawColor)
+		ret.cross[1].SetAttribute("stroke", drawColor)
 	case Empty:
 		ret.square.SetAttribute("fill-opacity", 0.0)
 		ret.square.SetAttribute("style", "")
@@ -173,8 +183,8 @@ func (board *UIBoard) AddUIBox(state Mark, x, y, width, height int) UIBox {
 	return ret
 }
 
-func (board *UIBoard) UpdateCoord(state Mark, x, y int) {
-	if x+1 > board.cols || y+1 > board.rows {
+func (board *UIBoard) UpdateCoord(move Move) {
+	if move.X+1 > board.cols || move.Y+1 > board.rows {
 		return
 	}
 	minX := board.x + board.width/4
@@ -183,5 +193,8 @@ func (board *UIBoard) UpdateCoord(state Mark, x, y int) {
 
 	width := (maxX - minX) / board.cols
 	height := width
-	board.squares = append(board.squares, board.AddUIBox(state, minX+width*x, minY+height*y, width, height))
+
+	move.X = minX+width*move.X
+	move.Y = minY+height*move.Y
+	board.squares = append(board.squares, board.AddUIBox(move, width, height))
 }

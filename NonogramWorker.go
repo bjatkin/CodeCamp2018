@@ -31,9 +31,9 @@ func (w Worker) Solve() (bool, error) {
 			case Spaces:
 				// w.SolveBySpaces()
 			case Forcing:
-				//w.SolveByForcing()
+				// w.SolveByForcing()
 			case Glue:
-				// w.SolveByGlue()
+				w.SolveByGlue()
 			case Joining:
 				// w.SolveByJoining()
 			case Splitting:
@@ -114,6 +114,7 @@ func (w Worker) SolveByBoxes() {
 				for k := B; k < E; k++ {
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
+						MethodId: Boxes,
 						X:        k,
 						Y:        i,
 						Mark:     Fill,
@@ -164,6 +165,7 @@ func (w Worker) SolveByBoxes() {
 				for k := B; k < E; k++ {
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
+						MethodId: Boxes,
 						X:        i,
 						Y:        k,
 						Mark:     Fill,
@@ -202,6 +204,7 @@ func (w Worker) SolveByForcing() {
 					//fmt.Printf("fill in X:%d, Y:%d\n", start+offset+k, row)
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
+						MethodId: Forcing,
 						X:        start + offset + k,
 						Y:        row,
 						Mark:     Fill,
@@ -227,6 +230,7 @@ func (w Worker) SolveByForcing() {
 					//fmt.Printf("fill in X:%d, Y:%d\n", col, start+offset+k)
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
+						MethodId: Forcing,
 						X:        col,
 						Y:        start + offset + k,
 						Mark:     Fill,
@@ -337,6 +341,8 @@ func getChunkCol(m [][]Mark, col, i int) (int, int) {
 }
 
 func (w Worker) SolveByGlue() {
+	fmt.Printf("Worker[%d] working on Glue\n", w.Id)
+
 	for r, row := range w.Board.BoardMarks {
 		farLeft := make([]Mark, len(row))
 		farRight := make([]Mark, len(row))
@@ -371,6 +377,7 @@ func (w Worker) SolveByGlue() {
 				Logf("b", "X: %d, Y: %d", i, row)
 				w.MovesOut <- Move{
 					WorkerId: w.Id,
+					MethodId: Glue,
 					X:        i,
 					Y:        r,
 					Mark:     Fill,
@@ -412,6 +419,7 @@ func (w Worker) SolveByGlue() {
 			if leftFill == farRight[i] && leftFill == Fill {
 				w.MovesOut <- Move{
 					WorkerId: w.Id,
+					MethodId: Glue,
 					X:        c,
 					Y:        i,
 					Mark:     Fill,
