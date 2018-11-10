@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"sync"
 )
 
@@ -22,7 +23,7 @@ func (w Worker) Solve() (bool, error) {
 	for _, val := range w.Tasks {
 		switch val {
 		case Boxes:
-			w.SolveByBoxes()
+			// w.SolveByBoxes()
 		case Spaces:
 			// w.SolveBySpaces()
 		case Forcing:
@@ -93,11 +94,11 @@ func (w Worker) SolveByBoxes() {
 		//fmt.Printf("Overlap: %+v\n", C)
 		for j := 0; j < w.Board.ColumnCount; j++ {
 			if C[j] == Fill {
-				w.MovesOut <- Move {
+				w.MovesOut <- Move{
 					WorkerId: w.Id,
-					X: j,
-					Y: i,
-					Mark: Fill,
+					X:        j,
+					Y:        i,
+					Mark:     Fill,
 				}
 			}
 		}
@@ -113,11 +114,11 @@ func (w Worker) SolveByBoxes() {
 		//fmt.Printf("Overlap: %+v\n", C)
 		for j := 0; j < w.Board.RowCount; j++ {
 			if C[j] == Fill {
-				w.MovesOut <- Move {
+				w.MovesOut <- Move{
 					WorkerId: w.Id,
-					X: i,
-					Y: j,
-					Mark: Fill,
+					X:        i,
+					Y:        j,
+					Mark:     Fill,
 				}
 			}
 		}

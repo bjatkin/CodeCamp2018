@@ -23,18 +23,18 @@ func main() {
 	GuiMovesIn := make(chan Move, WorkerCount*1000)
 
 	rowHints := [][]int{
-		{2, 2},
-		{3},
 		{0},
-		{3},
-		{1, 3},
+		{2},
+		{0},
+		{0},
+		{1, 1, 1},
 	}
 	columnHints := [][]int{
-		{2, 1},
-		{4},
 		{1, 2},
-		{1, 2},
-		{5},
+		{0},
+		{0},
+		{0},
+		{2},
 	}
 
 	board := drawUI(500, columnHints, rowHints)
@@ -43,7 +43,7 @@ func main() {
 	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)
 	nonogramMaster.Solve()
 
-	tick := time.Tick(10 * time.Millisecond)
+	tick := time.Tick(50 * time.Millisecond)
 	for {
 		select {
 		case <-tick:
