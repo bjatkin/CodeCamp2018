@@ -20,7 +20,7 @@ func init() {
 }
 
 func main() {
-	GuiMovesIn := make(chan Move, WorkerCount)
+	GuiMovesIn := make(chan Move, WorkerCount*10000)
 	GuiMovesIn <- Move{0, 0, 0, Fill}
 
 	rowHints := [][]int{
@@ -44,7 +44,7 @@ func main() {
 	nonogramMaster := NewMaster(mainBoard, GuiMovesIn)
 	nonogramMaster.Solve()
 
-	tick := time.Tick(500 * time.Millisecond)
+	tick := time.Tick(50 * time.Millisecond)
 	for {
 		select {
 		case <-tick:
