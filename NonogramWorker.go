@@ -47,39 +47,6 @@ func (w Worker) Solve() (bool, error) {
 	return true, nil
 }
 
-func (w Worker) LeftFill(hints []int, length int) (A []Mark) {
-	A = make([]Mark, length)
-	current := 0
-	for i := 0; i < len(hints); i++ {
-		for j := 0; j < hints[i]; j, current = j+1, current+1 {
-			A[current] = Fill
-		}
-		current++
-	}
-	return
-}
-
-func (w Worker) RightFill(hints []int, length int) (A []Mark) {
-	A = make([]Mark, length)
-	current := length - 1
-	for i := len(hints) - 1; i >= 0; i-- {
-		for j, stop := current, current-hints[i]; j > stop; j, current = j-1, current-1 {
-			A[current] = Fill
-		}
-		current--
-	}
-	return
-}
-
-func (w Worker) BoxOverlap(A []Mark, B []Mark, length int) (C []Mark) {
-	C = make([]Mark, length)
-	for i := 0; i < length; i++ {
-		if A[i] == B[i] && A[i] == Fill {
-			C[i] = Fill
-		}
-	}
-	return
-}
 
 func (w Worker) SolveByBoxes() {
 	fmt.Printf("Worker[%d] working on Boxes\n", w.Id)
@@ -106,17 +73,15 @@ func (w Worker) SolveByBoxes() {
 		for j := 0; j < len(w.Board.RowHints[i]); j++ {
 			// F is the number of cells that can be filled
 			F := w.Board.RowHints[i][j] - D
-			//fmt.Printf("F = %d = %d - %d\n", F, D, w.Board.RowHints[i][j])
+			//fmt.Printf("F = %d = %d - %d\n", F, w.Board.RowHints[i][j], D)
 
 			E += w.Board.RowHints[i][j]
+			//fmt.Printf("E = %d = %d + %d\n", E, E - w.Board.RowHints[i][j], w.Board.RowHints[i][j])
 
 			if F > 0 {
 				// Index to begin marking as filled
 				B := E - F
-				fmt.Printf("E = %d = %d + %d + 1\n", E, E - w.Board.RowHints[i][j], w.Board.RowHints[i][j])
-				fmt.Printf("B = %d = %d - %d\n", B, B + F, F)
-
-				fmt.Printf("X: Y:")
+				//fmt.Printf("B = %d = %d - %d\n", B, B + F, F)
 
 				// Fill all cells between the values B and E
 				for k := B; k < E; k++ {
@@ -131,51 +96,60 @@ func (w Worker) SolveByBoxes() {
 
 			// Increment for space
 			E += 1
+			//fmt.Printf("E = %d = %d + 1\n", E, E + 1)
 		}
-		fmt.Printf("\n")
-	}
-
-	/*
-	// Run on rows
-	for i := 0; i < w.Board.ColumnCount; i++ {
-		A := w.LeftFill(w.Board.RowHints[i], w.Board.ColumnCount)
-		//fmt.Printf("Left: %+v\n", A)
-		B := w.RightFill(w.Board.RowHints[i], w.Board.ColumnCount)
-		//fmt.Printf("Right: %+v\n", B)
-		C := w.BoxOverlap(A, B, w.Board.ColumnCount)
-		//fmt.Printf("Overlap: %+v\n", C)
-		for j := 0; j < w.Board.ColumnCount; j++ {
-			if C[j] == Fill {
-				w.MovesOut <- Move{
-					WorkerId: w.Id,
-					X:        j,
-					Y:        i,
-					Mark:     Fill,
-				}
-			}
-		}
+		//fmt.Printf("\n")
 	}
 
 	// Run on columns
 	for i := 0; i < w.Board.RowCount; i++ {
-		A := w.LeftFill(w.Board.ColumnHints[i], w.Board.RowCount)
-		//fmt.Printf("Top: %+v\n", A)
-		B := w.RightFill(w.Board.ColumnHints[i], w.Board.RowCount)
-		//fmt.Printf("Bottom: %+v\n", B)
-		C := w.BoxOverlap(A, B, w.Board.RowCount)
-		//fmt.Printf("Overlap: %+v\n", C)
-		for j := 0; j < w.Board.RowCount; j++ {
-			if C[j] == Fill {
-				w.MovesOut <- Move{
-					WorkerId: w.Id,
-					X:        i,
-					Y:        j,
-					Mark:     Fill,
-				}
+		S := 0
+		// H is the highest value of Hints
+		H := 0
+		for _, value := range w.Board.ColumnHints[i] {
+			S += value
+			if value > H {
+				H = value
 			}
 		}
+		// S is the total value of the hints plus the spaces between them
+		S += len(w.Board.ColumnHints[i])-1
+		//fmt.Printf("S = %d = %d + %d\n", S, S - len(w.Board.ColumnHints[i])+1, len(w.Board.ColumnHints[i])-1)
+		// D is the difference between the sum and the total length
+		D := w.Board.RowCount - S
+		//fmt.Printf("D = %d = %d - %d\n", D, w.Board.RowCount, S)
+
+		E := 0
+		for j := 0; j < len(w.Board.ColumnHints[i]); j++ {
+			// F is the number of cells that can be filled
+			F := w.Board.ColumnHints[i][j] - D
+			//fmt.Printf("F = %d = %d - %d\n", F, w.Board.ColumnHints[i][j], D)
+
+			E += w.Board.ColumnHints[i][j]
+			//fmt.Printf("E = %d = %d + %d\n", E, E - w.Board.ColumnHints[i][j], w.Board.ColumnHints[i][j])
+
+			if F > 0 {
+				// Index to begin marking as filled
+				B := E - F
+				//fmt.Printf("B = %d = %d - %d\n", B, B + F, F)
+
+				// Fill all cells between the values B and E
+				for k := B; k < E; k++ {
+					w.MovesOut <- Move {
+						WorkerId: w.Id,
+						X: i,
+						Y: k,
+						Mark: Fill,
+					}
+				}
+			}
+
+			// Increment for space
+			E += 1
+			//fmt.Printf("E = %d = %d + 1\n", E, E + 1)
+		}
+		//fmt.Printf("\n")
 	}
-	*/
 }
 
 func (w Worker) SolveBySpaces() {
