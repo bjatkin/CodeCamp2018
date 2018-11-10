@@ -11,6 +11,7 @@ const (
 
 type Move struct {
 	WorkerId int
+	MethodId Method
 	X        int
 	Y        int
 	Mark     Mark

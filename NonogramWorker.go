@@ -113,6 +113,7 @@ func (w Worker) SolveByBoxes() {
 				for k := B; k < E; k++ {
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
+						MethodId: Boxes,
 						X:        k,
 						Y:        i,
 						Mark:     Fill,
@@ -163,6 +164,7 @@ func (w Worker) SolveByBoxes() {
 				for k := B; k < E; k++ {
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
+						MethodId: Boxes,
 						X:        i,
 						Y:        k,
 						Mark:     Fill,
@@ -201,7 +203,8 @@ func (w Worker) SolveByForcing() {
 					fmt.Printf("fill in a X:%d, Y:%d\nchunk: %v, offset: %v\nfillIn: %d\nhint:%d\n", start+off+k-1, row, chunk, offset, fillIn, hint)
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
-						X:        start + off + k - 1,
+						MethodId: Forcing,
+						X:        start + off + k,
 						Y:        row,
 						Mark:     Fill,
 					}
@@ -226,6 +229,7 @@ func (w Worker) SolveByForcing() {
 					fmt.Printf("fill in b X:%d, Y:%d\nchunk: %v\n offset: %v\n", col, start+off+k, chunk, offset)
 					w.MovesOut <- Move{
 						WorkerId: w.Id,
+						MethodId: Forcing,
 						X:        col,
 						Y:        start + off + k,
 						Mark:     Fill,
@@ -383,6 +387,7 @@ func (w Worker) SolveByGlue() {
 				// Logf("b", "X: %d, Y: %d", i, row)
 				w.MovesOut <- Move{
 					WorkerId: w.Id,
+					MethodId: Glue,
 					X:        i,
 					Y:        r,
 					Mark:     Fill,
@@ -432,6 +437,7 @@ func (w Worker) SolveByGlue() {
 			if leftFill == farRight[i] && leftFill == Fill {
 				w.MovesOut <- Move{
 					WorkerId: w.Id,
+					MethodId: Glue,
 					X:        c,
 					Y:        i,
 					Mark:     Fill,
