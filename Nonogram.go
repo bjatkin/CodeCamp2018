@@ -6,9 +6,11 @@ const (
 	Fill  Mark = 0
 	Cross Mark = 1
 	Empty Mark = 2
+	MarkCount Mark = 3
 )
 
 type Move struct {
+	WorkerId int
 	X    int
 	Y    int
 	Mark Mark
