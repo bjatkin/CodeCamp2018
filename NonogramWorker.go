@@ -8,7 +8,7 @@ import (
 
 type Worker struct {
 	Id       int
-	Board    *Board
+	Board    Board
 	MovesIn  chan Move
 	MovesOut chan Move
 	Tasks    []Method

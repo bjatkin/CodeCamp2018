@@ -12,8 +12,8 @@ type Board struct {
 	RowHints    [][]int
 }
 
-func NewBoard(rowCount, columnCount int, rowHints, columnHints [][]int) (b *Board) {
-	b = &Board{}
+func NewBoard(rowCount, columnCount int, rowHints, columnHints [][]int) (b Board) {
+	b = Board{}
 	b.RowCount = rowCount
 	b.ColumnCount = columnCount
 	b.RowHints = rowHints
