@@ -69,11 +69,12 @@ type UIText struct {
 }
 
 func flipArray(numbers []int) []int {
+	ret := make([]int, len(numbers))
 	for i := 0; i < len(numbers)/2; i++ {
 		j := len(numbers) - i - 1
-		numbers[i], numbers[j] = numbers[j], numbers[i]
+		ret[i], ret[j] = numbers[j], numbers[i]
 	}
-	return numbers
+	return ret
 }
 
 func (board *UIBoard) AddText(horizontal bool, nums []int, index int) UIText {
