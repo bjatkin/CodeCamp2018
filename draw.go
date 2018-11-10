@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/dennwc/dom/svg"
 )
 
@@ -23,6 +25,15 @@ func drawUI(rowHints, columnHints [][]int) UIBoard {
 	// 		}
 	// 	}
 	// }
+
+	//Fade the GUI in
+	go func() {
+		interval := time.Millisecond * 10
+		for i := 0.0; i < 1; i += 0.01 {
+			board.root.SetAttribute("opacity", i)
+			time.Sleep(interval)
+		}
+	}()
 
 	return board
 }
